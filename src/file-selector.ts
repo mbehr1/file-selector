@@ -148,7 +148,16 @@ function fromDirEntry(entry: any) {
                 if (!batch.length) {
                     // Done reading directory
                     try {
-                        const files = await Promise.all(entries);
+                        const files = (await Promise.allSettled(entries))
+                            .filter(p => {
+                                if (p.status === 'rejected') {
+                                    // todo currently there is no better way to report any error without reject full request
+                                    // so at least dont fail silently here but throw a console.error
+                                    // tslint:disable-next-line:no-console
+                                    console.error(`fromDirEntry.readEntries rejected entry with reason='${p.reason}'`);
+                                }
+                                return p.status === 'fulfilled'
+                            }).map(p => (p as unknown as PromiseFulfilledResult<FileValue[]>).value);
                         resolve(files);
                     } catch (err) {
                         reject(err);
