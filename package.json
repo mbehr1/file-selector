@@ -30,6 +30,7 @@
     "url": "https://github.com/react-dropzone/file-selector.git"
   },
   "scripts": {
+    "prepare": "npm run build",
     "prebuild": "yarn run clean",
     "build": "npm-run-all -s compile build:umd",
     "build:umd": "rollup -c ./rollup.config.js",
